@@ -28,7 +28,7 @@
 ## 🚀 Live Demo
 
 Try the interactive prediction app here:  
-👉 Coming Soon!
+👉 https://gold-trend-prediction.streamlit.app/
 
 ---
 
