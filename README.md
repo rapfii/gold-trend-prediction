@@ -71,7 +71,7 @@ Running the full pipeline produces a comprehensive output across data processing
   - **ROC-AUC Score:** 0.5046
   - *Note: Financial forecasting is inherently noisy. An accuracy hovering around 50% is standard for raw daily directional predictions on mature assets like Gold.*
 - Automatically renders and saves crucial analytical graphics into the `images/` directory:
-  - 🌡️ **Correlation Heatmap:** Maps relationships between technical indicators and the target variable.
+  - 🌡️ **Correlation Heatmap:** Maps relationships between technical indicators and the target variable using the strict global dark theme (`#0E1117`).
   - 📋 **Confusion Matrix:** Illustrates the raw count of True Positives/Negatives vs. False Predictions.
   - 📊 **Feature Importance:** Highlights the absolute coefficients, showing which indicators drive the Logistic Regression's decisions.
 
@@ -88,6 +88,7 @@ Running the full pipeline produces a comprehensive output across data processing
 - Model comparison: Logistic Regression, Random Forest, XGBoost
 - Model evaluation with accuracy, ROC-AUC, and classification report
 - Saved model deployment via an interactive Streamlit dashboard
+- Strict dark-theme visualization systems
 
 ---
 
@@ -214,7 +215,10 @@ gold-trend-classification/
 ├── images/
 │   ├── heatmap.png                  ← Feature correlation heatmap
 │   ├── confusion_matrix.png         ← Confusion matrix visualization
-│   └── feature_importance.png       ← Feature importance/coefficients
+│   ├── feature_importance.png       ← Feature importance/coefficients
+│   ├── price_trend.png              ← Gold price trend plot
+│   ├── rsi_chart.png                ← Relative Strength Index chart
+│   └── macd_chart.png               ← MACD chart
 │
 ├── app.py                           ← Streamlit prediction web app
 ├── requirements.txt                 ← Python dependencies

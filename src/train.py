@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
 
+# Strictly historical features
 FEATURES = [
     'Volume', 'SMA_7', 'SMA_30', 'EMA_14', 'RSI_14', 
     'MACD', 'MACD_Signal', 'Daily_Return', 'Volatility_14', 
@@ -15,14 +16,15 @@ FEATURES = [
 TARGET = 'Target'
 
 def train_models():
+    """Trains models with STRICT chronological splitting and scaling."""
     print("Loading processed data...")
     if not os.path.exists('data/processed/gold_processed_data.csv'):
-        print("Processed data not found. Run 'python src/preprocess.py' first.")
+        print("Processed data not found. Run 'python -m src.preprocess' first.")
         return
         
     df = pd.read_csv('data/processed/gold_processed_data.csv', index_col='Date')
     
-    # Chronological split
+    # 5. Split data chronologically (NO SHUFFLE)
     split_index = int(len(df) * 0.8)
     train_df = df.iloc[:split_index]
     test_df = df.iloc[split_index:]
@@ -32,6 +34,7 @@ def train_models():
     
     print("Scaling features...")
     scaler = StandardScaler()
+    # STRICT RULE: Fit scaler ONLY on training data
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     

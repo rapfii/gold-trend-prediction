@@ -23,7 +23,7 @@ def predict_next_day(df_latest: pd.DataFrame):
         model = joblib.load('models/gold_trend_model.pkl')
         scaler = joblib.load('models/scaler.pkl')
     except FileNotFoundError:
-        print("Model or scaler not found. Please run src/train.py first.")
+        print("Model or scaler not found. Please run 'python -m src.train' first.")
         return None, None
         
     # Get the latest row of features
@@ -40,8 +40,7 @@ def predict_next_day(df_latest: pd.DataFrame):
 
 if __name__ == "__main__":
     df = get_latest_data()
-    # Assume the very last row might be incomplete during market hours.
-    # For safety, we drop it to only evaluate the most recent FULLY CLOSED session.
+    # STRICT RULE: Ignore incomplete candle
     df_closed = df.iloc[:-1]
     
     pred, prob = predict_next_day(df_closed)

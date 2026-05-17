@@ -1,10 +1,20 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from src.predict import get_latest_data, predict_next_day
 
 # Configure page settings
 st.set_page_config(page_title="Gold Trend Predictor", page_icon="📈", layout="wide")
+
+# 🎨 STRICT GLOBAL VISUALIZATION SYSTEM (Plotly mapping)
+DARK_BG = '#0E1117'
+COLORS = {
+    'blue': '#4FC3F7',
+    'orange': '#FFB74D',
+    'green': '#81C784',
+    'red': '#E57373'
+}
 
 # Header Section
 st.title("🥇 Gold Trend Classification System")
@@ -19,7 +29,6 @@ def load_and_predict():
     df = get_latest_data()
     
     # STRICT RULE: Ensure we only use fully closed candles.
-    # By dropping the last row, we guarantee the indicators are not corrupted by intra-day volatility.
     df_closed = df.iloc[:-1] 
     
     pred, prob = predict_next_day(df_closed)
@@ -45,32 +54,34 @@ st.divider()
 st.header("📊 Market Data & Technical Indicators")
 
 # Plotly Candlestick with SMAs
-fig = go.Figure()
+fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.03, row_heights=[0.7, 0.3])
+
 fig.add_trace(go.Candlestick(x=df.index,
-                open=df['Open'],
-                high=df['High'],
-                low=df['Low'],
-                close=df['Close'],
-                name='Gold Price'))
+                open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'],
+                name='Gold Price', increasing_line_color=COLORS['green'], decreasing_line_color=COLORS['red']), row=1, col=1)
 
-fig.add_trace(go.Scatter(x=df.index, y=df['SMA_7'], line=dict(color='orange', width=1), name='SMA 7'))
-fig.add_trace(go.Scatter(x=df.index, y=df['SMA_30'], line=dict(color='blue', width=1), name='SMA 30'))
+fig.add_trace(go.Scatter(x=df.index, y=df['SMA_7'], line=dict(color=COLORS['orange'], width=1.5), name='SMA 7'), row=1, col=1)
+fig.add_trace(go.Scatter(x=df.index, y=df['SMA_30'], line=dict(color=COLORS['blue'], width=1.5), name='SMA 30'), row=1, col=1)
 
-fig.update_layout(title='Gold Futures (GC=F) - Recent Trend',
-                  yaxis_title='Price (USD)',
-                  template='plotly_dark',
-                  xaxis_rangeslider_visible=False)
+# RSI Subplot
+fig.add_trace(go.Scatter(x=df.index, y=df['RSI_14'], name='RSI 14', line=dict(color=COLORS['blue'])), row=2, col=1)
+fig.add_hline(y=70, line_dash="dash", line_color=COLORS['red'], row=2, col=1)
+fig.add_hline(y=30, line_dash="dash", line_color=COLORS['green'], row=2, col=1)
+
+# Theme updates
+fig.update_layout(
+    title='Gold Futures (GC=F) - Recent Trend & Momentum',
+    template='plotly_dark',
+    plot_bgcolor=DARK_BG,
+    paper_bgcolor=DARK_BG,
+    xaxis_rangeslider_visible=False,
+    height=600,
+    margin=dict(l=0, r=0, t=40, b=0)
+)
+fig.update_yaxes(title_text="Price (USD)", row=1, col=1)
+fig.update_yaxes(title_text="RSI", row=2, col=1)
 
 st.plotly_chart(fig, use_container_width=True)
-
-# RSI Visualization
-st.subheader("Relative Strength Index (RSI)")
-fig_rsi = go.Figure()
-fig_rsi.add_trace(go.Scatter(x=df.index, y=df['RSI_14'], name='RSI 14', line=dict(color='purple')))
-fig_rsi.add_hline(y=70, line_dash="dash", line_color="red", annotation_text="Overbought")
-fig_rsi.add_hline(y=30, line_dash="dash", line_color="green", annotation_text="Oversold")
-fig_rsi.update_layout(yaxis_title='RSI', template='plotly_dark', height=300)
-st.plotly_chart(fig_rsi, use_container_width=True)
 
 st.markdown("""
 ---
